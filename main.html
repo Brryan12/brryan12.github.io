@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>¿Quieres ser mi Valentín?</title>
+  <style>
+    /* ===== Estilos Generales ===== */
+    body {
+      margin: 0;
+      background: #ffebee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      overflow: hidden; /* Evita scroll durante las animaciones */
+    }
+    /* ===== Contenedor del Sobre ===== */
+    .envelope-container {
+      position: relative;
+      width: 500px;
+      height: 300px;
+      cursor: pointer;
+      /* Animación de rebote suave */
+      animation: bounce 2s infinite ease-in-out;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    /* ===== Sobre ===== */
+    .envelope {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #e57373;
+      border: 2px solid #e91e63;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    /* ===== Solapa del Sobre ===== */
+    .flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 120px;
+      background: #d32f2f;
+      /* Forma triangular usando clip-path */
+      clip-path: polygon(0% 0%, 50% 100%, 100% 0%);
+      transform-origin: top;
+      transition: transform 0.5s ease;
+      z-index: 2;
+    }
+    /* ===== Carta (contenido interno) ===== */
+    .letter {
+      position: absolute;
+      left: 50%;
+      width: 90%;
+      height: 220px;
+      background: transparent;
+      transform: translateX(-50%);
+      /* Inicialmente, la carta se ubica fuera del sobre (abajo) */
+      top: 320px;
+      transition: top 0.5s ease;
+      z-index: 1;
+      cursor: pointer;
+    }
+    /* Al pasar el cursor sobre el contenedor, se abre la solapa y la carta sube */
+    .envelope-container:hover .flap {
+      transform: rotateX(180deg);
+    }
+    .envelope-container:hover .letter {
+      top: 80px;
+    }
+    /* ===== Contenido de la Carta ===== */
+    .container {
+      text-align: center;
+      padding: 2rem;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      height: 100%;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+    .container h1 {
+      color: #e91e63;
+      margin-bottom: 2rem;
+    }
+    /* Contenedor de botones centrado y con separación */
+    .buttons {
+      position: relative;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+      height: 100px; /* Asegura suficiente espacio para el movimiento vertical */
+    }
+    .buttons button {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 25px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: transform 0.3s;
+      position: absolute; /* Para mover el botón dentro del contenedor */
+    }
+    #si {
+      background: #e91e63;
+      color: white;
+      position: static; /* Mantiene el botón "Sí" en su lugar */
+    }
+    #no {
+      background: #607d8b;
+      color: white;
+      transition: all 0.3s;
+    }
+    /* Vista previa del GIF al pasar sobre "No" */
+    .gif-preview {
+      position: absolute;
+      bottom: 120%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .gif-preview img {
+      width: 200px;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    #no:hover + .gif-preview {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* ===== Animación al hacer click en la carta ===== */
+    /* Fase 1: Animación de salida (la carta se desliza hacia arriba y desaparece) */
+    @keyframes exitAnimation {
+      0% {
+        top: 80px;
+        opacity: 1;
+      }
+      100% {
+        top: -150%;
+        opacity: 0;
+      }
+    }
+    .letter.exit {
+      animation: exitAnimation 0.5s forwards;
+    }
+    /* Fase 2: Estilo expandido para mostrar la carta completa y legible,
+       con un 25% menos de tamaño (aproximadamente 67.5vw x 67.5vh, simétrico) */
+    .letter.expanded {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 67.5vw;
+      height: 67.5vh;
+      z-index: 100;
+      opacity: 1;
+      transition: all 0.5s ease;
+    }
+    /* Estilo para el mensaje de instrucción */
+    .instruction {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 1rem;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <!-- Mensaje de instrucción -->
+  <div class="instruction" id="instruction">Click the page in the envelope to make it bigger</div>
+  
+  <!-- Sobre con la carta animada -->
+  <div class="envelope-container">
+    <div class="envelope">
+      <!-- Solapa del sobre -->
+      <div class="flap"></div>
+      <!-- Carta (contenido interno) -->
+      <div class="letter">
+        <div class="container">
+          <h1>Do you want to be my Valentine? 💖</h1>
+          <div class="buttons">
+            <button id="si">¡Yes!</button>
+            <button id="no">No</button>
+            <div class="gif-preview">
+              <img src="https://media4.giphy.com/media/KxDqcD2mAEuOFMMu1g/giphy.gif" alt="GIF preview">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ===== JavaScript para los botones y animación de la carta ===== -->
+  <script>
+    const noButton = document.getElementById('no');
+    const siButton = document.getElementById('si');
+    const buttonsContainer = document.querySelector('.buttons');
+    const letter = document.querySelector('.letter');
+    const container = document.querySelector('.container');
+    const instruction = document.getElementById('instruction');
+
+    // Función para mover el botón "No" de forma aleatoria dentro de su contenedor
+    function moveButton() {
+      noButton.style.position = 'absolute';
+      const containerRect = buttonsContainer.getBoundingClientRect();
+      const buttonRect = noButton.getBoundingClientRect();
+      
+      const maxX = containerRect.width - buttonRect.width;
+      const maxY = containerRect.height - buttonRect.height;
+      
+      const randomX = Math.random() * maxX;
+      const randomY = Math.random() * maxY;
+      
+      noButton.style.left = `${randomX}px`;
+      noButton.style.top = `${randomY}px`;
+    }
+
+    noButton.addEventListener('click', moveButton);
+    noButton.addEventListener('mouseenter', moveButton);
+
+    // Al hacer click en el botón "¡Sí!", se muestra un mensaje bonito en la carta.
+    siButton.addEventListener('click', (e) => {
+      // Evitamos que el click se propague a la carta y active la animación de expandir.
+      e.stopPropagation();
+      container.innerHTML = `
+        <h1>¡I love you Mika <3!</h1>
+        <p>
+          Tu amor ilumina mi vida y me hace sentir especial cada día.
+          Gracias por ser tú y llenar mis momentos de alegría. 💖
+        </p>
+        <div>
+          <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZzc2YTVtb3d6ejljaHl2ZHNjbWFjcnhtem9iam94emg1ZXRiczM5aSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/otxwaMQBfNh4ZNnvSm/giphy.gif" alt="San Valentín GIF" style="width: 100%; max-width: 400px; border-radius: 10px; margin-top: 20px;">
+        </div>
+      `;
+    });
+
+    // Al hacer click en la carta (exceptuando clicks en botones), se activa la animación:
+    // Primero, la carta se desliza hacia arriba y desaparece; luego se expande de forma simétrica y 25% más pequeña.
+    letter.addEventListener('click', () => {
+      // Si ya se expandió, no se vuelve a animar
+      if (letter.classList.contains('expanded')) return;
+      
+      // Agrega la clase para la animación de salida
+      letter.classList.add('exit');
+      
+      // Al finalizar la animación de salida, quitar la clase "exit" y agregar "expanded"
+      letter.addEventListener('animationend', () => {
+        letter.classList.remove('exit');
+        letter.classList.add('expanded');
+        instruction.style.display = 'none'; // Oculta el mensaje de instrucción
+      }, { once: true });
+    });
+
+    function goBack() {
+      document.querySelector('.message').style.display = 'none';
+      document.querySelector('.envelope-container').style.display = 'block';
+      letter.classList.remove('expanded');
+      instruction.style.display = 'block'; // Muestra el mensaje de instrucción nuevamente
+    }
+  </script>
+</body>
+</html>
